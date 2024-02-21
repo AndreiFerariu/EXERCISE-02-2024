@@ -8,66 +8,47 @@ crud = CRUDOperations(
     database="ferariu_andrei_DBproducts"
 )
 
-# Esempio di inserimento di un record nella tabella "Products"
-crud.create(
-    table="Products",
-    nome="Prodotto1",
-    prezzo=19.99,
-    disponibilita=True
-)
-
 # Funzione per eseguire operazioni CRUD
-def execute_crud_operation(operation):
-    if operation == 1:  # Creare un nuovo prodotto
-        nome = input("Inserisci il nome del prodotto: ")
-        prezzo = float(input("Inserisci il prezzo del prodotto: "))
-        disponibilita = input("Il prodotto è disponibile? (Sì/No): ").lower() == "sì"
-        crud.create(
-            table="Products",
-            nome=nome,
-            prezzo=prezzo,
-            disponibilita=disponibilita
-        )
-    elif operation == 2:  # Leggere i prodotti
+def execute_crud_operation(request_type, data):
+    if request_type == "POST":  # Creare un nuovo prodotto
+        nome = data.get('nome')
+        prezzo = data.get('prezzo')
+        disponibilita = data.get('disponibilita')
+        if nome is not None and prezzo is not None and disponibilita is not None:
+            crud.create(
+                table="Products",
+                nome=nome,
+                prezzo=prezzo,
+                disponibilita=disponibilita
+            )
+        else:
+            print("Dati mancanti per l'operazione POST.")
+    elif request_type == "GET":  # Leggere i prodotti
         prodotti = crud.read(table="Products")
         print("Record presenti nella tabella Products:")
         for prodotto in prodotti:
             print(prodotto)
-    elif operation == 3:  # Aggiornare un prodotto esistente
-        product_id = int(input("Inserisci l'ID del prodotto da aggiornare: "))
-        nome = input("Inserisci il nuovo nome del prodotto: ")
-        prezzo = float(input("Inserisci il nuovo prezzo del prodotto: "))
-        disponibilita = input("Il prodotto è ancora disponibile? (Sì/No): ").lower() == "sì"
-        crud.update(
-            table="Products",
-            set_values={"nome": nome, "prezzo": prezzo, "disponibilita": disponibilita},
-            conditions=f"id = {product_id}"
-        )
-    elif operation == 4:  # Eliminare un prodotto
-        product_id = int(input("Inserisci l'ID del prodotto da eliminare: "))
-        crud.delete(
-            table="Products",
-            conditions=f"id = {product_id}"
-        )
+    elif request_type == "PUT":  # Aggiornare un prodotto esistente
+        product_id = data.get('id')
+        nome = data.get('nome')
+        prezzo = data.get('prezzo')
+        disponibilita = data.get('disponibilita')
+        if product_id is not None and nome is not None and prezzo is not None and disponibilita is not None:
+            crud.update(
+                table="Products",
+                set_values={"nome": nome, "prezzo": prezzo, "disponibilita": disponibilita},
+                conditions=f"id = {product_id}"
+            )
+        else:
+            print("Dati mancanti per l'operazione PUT.")
+    elif request_type == "DELETE":  # Eliminare un prodotto
+        product_id = data.get('id')
+        if product_id is not None:
+            crud.delete(
+                table="Products",
+                conditions=f"id = {product_id}"
+            )
+        else:
+            print("ID del prodotto mancante per l'operazione DELETE.")
     else:
-        print("Operazione non valida. Scegli tra '1', '2', '3' o '4'.")
-
-# Esempi di utilizzo dello switch case per le operazioni CRUD
-while True:
-    print("\nMenu Operazioni CRUD:")
-    print("1. Creare un nuovo prodotto")
-    print("2. Leggere i prodotti")
-    print("3. Aggiornare un prodotto esistente")
-    print("4. Eliminare un prodotto")
-    print("5. Uscire")
-    choice = input("Scelta: ")
-
-    if choice == "5":
-        print("Uscita...")
-        break
-
-    try:
-        operation = int(choice)
-        execute_crud_operation(operation)
-    except ValueError:
-        print("Input non valido. Inserisci un numero da 1 a 5.")
+        print("Comando non supportato.")
