@@ -1,6 +1,6 @@
 from crud_operations import CRUDOperations
 
-# Creazione di un'istanza della classe CRUDOperations
+# istanza della classe CRUDOperations
 crud = CRUDOperations(
     host="192.168.2.200",
     user="ferariu_andrei",
@@ -8,7 +8,7 @@ crud = CRUDOperations(
     database="ferariu_andrei_DBproducts"
 )
 
-# Funzione per eseguire operazioni CRUD
+# operazioni CRUD
 def execute_crud_operation(request_type, data):
     if request_type == "POST":  # Creare un nuovo prodotto
         nome = data.get('nome')
@@ -28,7 +28,7 @@ def execute_crud_operation(request_type, data):
         print("Record presenti nella tabella Products:")
         for prodotto in prodotti:
             print(prodotto)
-    elif request_type == "PUT":  # Aggiornare un prodotto esistente
+    elif request_type == "PUT":
         product_id = data.get('id')
         nome = data.get('nome')
         prezzo = data.get('prezzo')
