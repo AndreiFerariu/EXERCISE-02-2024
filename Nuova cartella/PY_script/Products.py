@@ -1,21 +1,28 @@
+from mysql_connection import MySQLConnection
+
 class Product:
     def __init__(self, name, price, availability):
         self.name = name
         self.price = price
-        self.availability = bool(availability)  # Converti l'input in un valore booleano
+        self.availability = availability
 
-    def display_info(self):
-        print(f"Product: {self.name}")
-        print(f"Price: {self.price}")
-        print(f"Availability: {self.availability}")
+class ProductManager:
+    def __init__(self, connection):
+        self.connection = connection
 
-class Products:
-    def __init__(self):
-        self.product_list = []
+    def create_product(self, product):
+        query = f"INSERT INTO Products (name, price, availability) VALUES ('{product.name}', {product.price}, {product.availability})"
+        self.connection.execute_query(query)
 
-    def add_product(self, product):
-        self.product_list.append(product)
+    def read_products(self):
+        query = "SELECT * FROM Products"
+        cursor = self.connection.execute_query(query)
+        return cursor.fetchall()
 
-    def display_products(self):
-        for product in self.product_list:
-            product.display_info()
+    def update_product(self, product):
+        query = f"UPDATE Products SET price = {product.price}, availability = {product.availability} WHERE name = '{product.name}'"
+        self.connection.execute_query(query)
+
+    def delete_product(self, product_name):
+        query = f"DELETE FROM Products WHERE name = '{product_name}'"
+        self.connection.execute_query(query)
