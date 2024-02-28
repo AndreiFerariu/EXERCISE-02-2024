@@ -1,38 +1,35 @@
 import mysql.connector
 
-class MySQLConnection:
-    def __init__(self, host, user, password, database):
+class DbManager:
+
+    def __init__(self, host, port, username, password, database):
         self.host = host
-        self.user = user
+        self.port = port
+        self.username = username
         self.password = password
         self.database = database
-        self.connection = None
+        self.connection = None  # Aggiungiamo un attributo per la connessione
 
-    def connect(self):
+    def establish_connection(self):
         try:
-            self.connection = mysql.connector.connect(
+            self.connection = mysql.connector.connect(  # Memorizziamo la connessione nell'attributo
                 host=self.host,
-                user=self.user,
+                port=self.port,
+                user=self.username,
                 password=self.password,
                 database=self.database
             )
-            if self.connection.is_connected():
-                print("Connessione al database avvenuta con successo!")
+            return self.connection
         except mysql.connector.Error as e:
-            print(f"Errore durante la connessione al database: {e}")
+            print("Errore di connessione al database:", str(e))
 
-    def execute_query(self, query):
-        try:
-            cursor = self.connection.cursor()
-            cursor.execute(query)
-            self.connection.commit()
-            print("Query eseguita con successo!")
-        except mysql.connector.Error as e:
-            print(f"Errore durante l'esecuzione della query: {e}")
-
-    def close_connection(self):
+    def close_connection(self):  # Aggiungiamo un metodo per chiudere la connessione
         if self.connection:
             self.connection.close()
+            print("Connessione chiusa.")
+        else:
+            print("Nessuna connessione attiva da chiudere.")
+
             print("Connessione al database chiusa.")
 
 
