@@ -4,9 +4,9 @@ import mysql.connector
 class Product:
 
     @staticmethod
-    def establish_connection():
+    def connection():
         try:
-            db_manager = DbManager("localhost", 3306, "ferariu_andrei", "masking.assurance.vitiating.", "ferariu_andrei_DBproducts") #cambia
+            db_manager = DbManager("localhost", 3306, "root", "", "DBproducts") #cambia
             return db_manager.connect()
         except mysql.connector.Error as e:
             print("Errore durante la connessione al database:", str(e))
@@ -34,10 +34,10 @@ class Product:
         return self._marca
 
     @staticmethod
-    def get_all():
+    def fetchAll():
         try: 
-            conn = Product.establish_connection()
-            cursor = conn.cursor()
+            conn = Product.connection()
+            cursor = conn.cursor(dictionary=True)
             cursor.execute("SELECT * FROM products")
             records = cursor.fetchall()
             cursor.close()
@@ -46,24 +46,38 @@ class Product:
             print("Errore durante la ricerca dei prodotti:", str(e))
 
     @staticmethod
-    def find_by_id(id):
+    def find_id(id):
         try:
-            conn = Product.establish_connection()
+            conn = Product.connection()
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM products WHERE id = %s", (id,))
             row = cursor.fetchone()
             conn.close()
             if row:
-                return Product(id=row[0], nome=row[1], prezzo=row[2], marca=row[3])
+                return dict(id=row[0], marca=row[1], nome=row[2], prezzo=row[3])
             else:
                 return None
         except mysql.connector.Error as e:
             print("Errore durante la ricerca del prodotto:", str(e))
+    def find_id_product(id):
+        try:
+            conn = Product.connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM products WHERE id = %s", (id,))
+            row = cursor.fetchone()
+            conn.close()
+            if row:
+                return Product(id=row[0], marca=row[1], nome=row[2], prezzo=row[3])
+            else:
+                return None
+        except mysql.connector.Error as e:
+            print("Errore durante la ricerca del prodotto:", str(e))
+    
 
     @staticmethod
     def create_product(product_data):
         try:
-            conn = Product.establish_connection()
+            conn = Product.connection()
             cursor = conn.cursor()
             cursor.execute("INSERT INTO products (nome, prezzo, marca) VALUES (%s, %s, %s)", (product_data['nome'], product_data['prezzo'], product_data['marca']))
             conn.commit()
@@ -76,7 +90,7 @@ class Product:
 
     def update_product(self, product_data):
         try:
-            conn = Product.establish_connection()
+            conn = Product.connection()
             cursor = conn.cursor()
             cursor.execute("UPDATE products SET marca = %s, nome = %s, prezzo = %s WHERE id = %s", (product_data['marca'], product_data['nome'], product_data['prezzo'], self.id,))
             conn.commit()
@@ -86,10 +100,12 @@ class Product:
 
     def delete_product(self):
         try:
-            conn = Product.establish_connection()
+            conn = Product.connection()
             cursor = conn.cursor()
             cursor.execute("DELETE FROM products WHERE id = %s", (self.id,))
             conn.commit()
             conn.close()
+            return True
         except mysql.connector.Error as e:
             print("Errore durante l'eliminazione del prodotto:", str(e))
+            return False
