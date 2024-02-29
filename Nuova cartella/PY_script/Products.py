@@ -1,4 +1,4 @@
-from dbmanager import DbManager
+from DB_connection import DbManager
 import mysql.connector
 
 class Product:
@@ -6,8 +6,8 @@ class Product:
     @staticmethod
     def connection():
         try:
-            db_manager = DbManager("192.168.2.200", 3306, "ferariu_andrei", "masking.assurance.vitiating.", "ferariu_andrei_DBproducts") #cambia
-            return db_manager.connect()
+            db_manager = DbManager("192.168.2.200", 3306, "ferariu_andrei", "masking.assurance.vitiating.", "ferariu_andrei_DBproducts") #cambia 
+            return db_manager.establish_connection()
         except mysql.connector.Error as e:
             print("Errore durante la connessione al database:", str(e))
 
